@@ -1,0 +1,115 @@
+.dashboard {
+  padding: 20px 16px;
+  color: var(--text-primary);
+}
+
+.quickStatus {
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.greeting {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.assetSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assetChip {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.green {
+  color: #34c759;
+}
+
+.red {
+  color: #ff3b30;
+}
+
+.keyEvent {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.eventText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.marketOverview {
+  margin-bottom: 20px;
+}
+
+.marketItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.marketName {
+  font-size: 14px;
+}
+
+.marketValue {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.alertsPreview {
+  margin-bottom: 20px;
+}
+
+.alertRow {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+
+.dailyBrief {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.briefList {
+  list-style: none;
+  padding: 0;
+}
+
+.briefList li {
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.briefList li:last-child {
+  border-bottom: none;
+}

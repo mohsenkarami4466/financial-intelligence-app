@@ -1,0 +1,90 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --nav-height: 60px;
+  font-size: 18px;               /* فونت پایه بزرگتر (معادل 18px) */
+}
+
+/* ---------- رنگ‌ها ---------- */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a6a;
+  --green: #00b894;
+  --red: #e17055;
+  --border: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0,0,0,0.05);
+  --floating-bg: rgba(255,255,255,0.85);
+  --nav-bg: rgba(245,247,250,0.95);
+  --nav-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eaeaea;
+  --text-secondary: #a0a0b0;
+  --green: #55efc4;
+  --red: #ff7675;
+  --border: #2d2d44;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --floating-bg: rgba(30,30,50,0.9);
+  --nav-bg: rgba(22,33,62,0.95);
+  --nav-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ---------- پایه ---------- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* کانتینر اصلی – تمام عرض مانیتور */
+.app-container {
+  width: 100%;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background 0.3s;
+}
+
+/* محتوای صفحات */
+.screen-content {
+  flex: 1;
+  padding: 24px 5vw;            /* کمی فاصله از لبه‌ها برای خوانایی */
+  padding-bottom: 80px;
+  overflow-y: auto;
+}
+
+.screen-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* ---------- موبایل ---------- */
+@media (max-width: 480px) {
+  :root {
+    --nav-height: auto;
+    font-size: 16px;            /* فونت موبایل کمی کوچک‌تر */
+  }
+  .screen-content {
+    padding: 16px 4vw;
+    padding-bottom: 80px;
+  }
+}

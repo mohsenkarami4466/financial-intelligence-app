@@ -1,0 +1,72 @@
+.assets {
+  padding: 20px;
+  color: var(--text-primary);
+}
+
+.title {
+  font-size: 22px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assetCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.assetInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assetIcon {
+  font-size: 32px;
+}
+
+.assetName {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.assetChange {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.green {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.red {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.label {
+  color: var(--text-secondary);
+}
+
+.assetTrend {
+  font-size: 24px;
+  color: var(--text-secondary);
+}
