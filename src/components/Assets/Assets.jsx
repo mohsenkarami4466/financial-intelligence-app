@@ -1,40 +1,75 @@
+import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useUserPreferences } from '../../contexts/UserPreferencesContext';
 import translations from '../../i18n/translations';
 import mockData from '../../data/mockData';
 import styles from './Assets.module.css';
 
 export default function Assets() {
   const { language } = useLanguage();
+  const { preferences } = useUserPreferences();
   const t = translations[language].assets;
-  const assets = mockData.assets;
+  const [customAssets, setCustomAssets] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [type, setType] = useState('other');
+
+  const baseAssets = mockData.assets.filter(asset => {
+    if (preferences.interests.length === 0) return true;
+    return preferences.interests.some(interest => asset.name.includes(interest));
+  });
+
+  const allAssets = [...baseAssets, ...customAssets];
+
+  const addCustomAsset = () => {
+    if (!name || !price) return;
+    const newAsset = {
+      id: 'custom_' + Date.now(),
+      name,
+      type,
+      price: parseFloat(price),
+      change: 0,
+      history: [parseFloat(price)],
+    };
+    setCustomAssets([...customAssets, newAsset]);
+    setName('');
+    setPrice('');
+    setShowForm(false);
+  };
 
   return (
     <div className={styles.assets}>
       <h2 className={styles.title}>{t.title}</h2>
-      <p className={styles.subtitle}>{t.subtitle}</p>
+      <button className={styles.addBtn} onClick={() => setShowForm(!showForm)}>
+        {language === 'fa' ? '+ افزودن دارایی' : '+ Add Asset'}
+      </button>
+
+      {showForm && (
+        <div className={styles.form}>
+          <input placeholder={language === 'fa' ? 'نام دارایی' : 'Asset name'} value={name} onChange={e => setName(e.target.value)} />
+          <input type="number" placeholder={language === 'fa' ? 'قیمت' : 'Price'} value={price} onChange={e => setPrice(e.target.value)} />
+          <select value={type} onChange={e => setType(e.target.value)}>
+            <option value="stock">{language === 'fa' ? 'سهام' : 'Stock'}</option>
+            <option value="crypto">{language === 'fa' ? 'ارز دیجیتال' : 'Crypto'}</option>
+            <option value="commodity">{language === 'fa' ? 'کالا' : 'Commodity'}</option>
+            <option value="currency">{language === 'fa' ? 'ارز' : 'Currency'}</option>
+            <option value="other">{language === 'fa' ? 'سایر' : 'Other'}</option>
+          </select>
+          <button onClick={addCustomAsset}>{language === 'fa' ? 'افزودن' : 'Add'}</button>
+        </div>
+      )}
 
       <div className={styles.assetList}>
-        {assets.map(asset => (
-          <div key={asset.name} className={styles.assetCard}>
-            <div className={styles.assetInfo}>
-              <span className={styles.assetIcon}>
-                {asset.name === 'Gold' ? '🟡' : 
-                 asset.name === 'USD' ? '💵' : 
-                 asset.name === 'Crypto' ? '₿' : '📈'}
-              </span>
-              <div>
-                <h3 className={styles.assetName}>{asset.name}</h3>
-                <p className={styles.assetChange}>
-                  <span className={asset.change >= 0 ? styles.green : styles.red}>
-                    {asset.change >= 0 ? '+' : ''}{asset.change}%
-                  </span>
-                  {' '}
-                  <span className={styles.label}>{t.today}</span>
-                </p>
-              </div>
+        {allAssets.map(asset => (
+          <div key={asset.id} className={styles.assetCard}>
+            <div>
+              <h3>{asset.name}</h3>
+              <span className={styles.type}>{asset.type}</span>
             </div>
-            <div className={styles.assetTrend}>
-              {asset.change >= 0 ? '▲' : '▼'}
+            <div className={styles.price}>{asset.price.toLocaleString()}</div>
+            <div className={asset.change >= 0 ? styles.green : styles.red}>
+              {asset.change > 0 ? '+' : ''}{asset.change}%
             </div>
           </div>
         ))}

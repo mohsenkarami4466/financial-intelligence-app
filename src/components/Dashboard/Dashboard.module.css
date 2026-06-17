@@ -1,42 +1,67 @@
 .dashboard {
-  padding: 20px 16px;
+  padding: 20px;
   color: var(--text-primary);
 }
 
-.quickStatus {
-  background: linear-gradient(135deg, #007aff, #5856d6);
-  color: #fff;
-  border-radius: 16px;
-  padding: 20px;
+.header {
   margin-bottom: 24px;
 }
 
 .greeting {
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
-.assetSummary {
+.date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.quickStatus {
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.assetCards {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.assetChip {
+.assetCard {
   background: rgba(255,255,255,0.2);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.assetName {
+  display: block;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.assetPrice {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 4px 0;
 }
 
 .green {
   color: #34c759;
+  font-weight: 600;
 }
 
 .red {
   color: #ff3b30;
+  font-weight: 600;
 }
 
 .keyEvent {
@@ -44,19 +69,17 @@
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 20px;
-  border: 1px solid var(--border);
 }
 
-.sectionTitle {
-  font-size: 16px;
+.eventTitle {
   font-weight: 600;
-  margin-bottom: 8px;
+  margin: 8px 0 4px;
 }
 
-.eventText {
+.eventSummary {
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text-secondary);
 }
 
 .marketOverview {
@@ -70,33 +93,29 @@
   border-bottom: 1px solid var(--border);
 }
 
-.marketName {
-  font-size: 14px;
-}
-
-.marketValue {
-  font-weight: 600;
-  font-size: 14px;
-}
-
 .alertsPreview {
   margin-bottom: 20px;
 }
 
 .alertRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: var(--bg-secondary);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;
-  font-size: 13px;
-  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.alertIcon {
+  font-size: 16px;
 }
 
 .dailyBrief {
   background: var(--bg-secondary);
   border-radius: 12px;
   padding: 16px;
-  border: 1px solid var(--border);
 }
 
 .briefList {
@@ -105,8 +124,7 @@
 }
 
 .briefList li {
-  padding: 6px 0;
-  font-size: 14px;
+  padding: 8px 0;
   border-bottom: 1px dashed var(--border);
 }
 

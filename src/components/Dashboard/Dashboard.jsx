@@ -8,61 +8,67 @@ export default function Dashboard() {
   const { language } = useLanguage();
   const { preferences } = useUserPreferences();
   const t = translations[language].dashboard;
-  const { interests, notificationLevel } = preferences;
+  const { interests } = preferences;
 
-  // فیلتر دارایی‌ها بر اساس علایق (اگر شامل "Stocks"، "Crypto" و غیره باشد)
-  const filteredAssets = mockData.assets.filter(asset =>
-    interests.includes(asset.name) || interests.includes('Economic News') // Economic News همه را نشان دهد
-  );
+  // فیلتر دارایی‌ها بر اساس علایق
+  const userAssetNames = interests.map(i => i === 'Economic News' ? null : i).filter(Boolean);
+  const filteredAssets = mockData.assets.filter(asset => {
+    if (userAssetNames.length === 0) return true;
+    return userAssetNames.some(name => asset.name.includes(name));
+  });
 
-  // برای نمایش ساده، بازارهای مرتبط
+  // فیلتر بازار
   const filteredMarkets = mockData.market.filter(m => {
     if (interests.includes('USD') && m.name === 'USD/IRR') return true;
     if (interests.includes('Gold') && m.name === 'Gold (XAU)') return true;
-    if (interests.includes('Crypto') && m.name === 'BTC') return true;
+    if (interests.includes('Crypto') && (m.name === 'Bitcoin' || m.name === 'Ethereum')) return true;
     if (interests.includes('Stocks') && m.name === 'S&P 500') return true;
-    return interests.includes('Economic News'); // اگر فقط Economic News باشد همه را نشان بده
+    if (interests.includes('Economic News')) return true;
+    return false;
   });
 
-  // هشدارهای مرتبط (مشروط)
-  const filteredAlerts = mockData.alerts.filter(alert => {
-    if (interests.includes('Gold') && alert.message.toLowerCase().includes('gold')) return true;
-    if (interests.includes('Crypto') && alert.message.toLowerCase().includes('crypto')) return true;
-    if (interests.includes('USD') && alert.message.toLowerCase().includes('usd')) return true;
-    if (interests.includes('Stocks') && alert.message.toLowerCase().includes('stock')) return true;
-    return interests.includes('Economic News');
+  // هشدارهای فعال مرتبط
+  const relevantAlerts = mockData.alerts.filter(alert => alert.active && filteredAssets.some(a => a.id === alert.assetId));
+
+  // خلاصه هوش مصنوعی: فقط نکات مرتبط
+  const relevantBrief = mockData.brief.filter(point => {
+    if (point.relatedAssets.length === 0) return true;
+    return point.relatedAssets.some(rel => filteredAssets.some(a => a.name.includes(rel)));
   });
 
-  // خلاصه روزانه را می‌توان بر اساس علایق شخصی‌سازی کرد (در mockData فعلاً ثابت)
-  const briefPoints = mockData.brief.filter(point => {
-    if (interests.includes('Gold') && point.toLowerCase().includes('gold')) return true;
-    if (interests.includes('Crypto') && point.toLowerCase().includes('bitcoin')) return true;
-    if (interests.includes('USD') && point.toLowerCase().includes('dollar')) return true;
-    if (interests.includes('Stocks') && point.toLowerCase().includes('stock')) return true;
-    return true; // سایر موارد را هم نشان بده
-  });
-
-  // درود متناسب با سطح هشدار (اختیاری)
-  const greetingMessage = t.greeting; // می‌توان پیام متفاوتی داد
+  const greeting = language === 'fa' ? 'روز بخیر' : 'Good day';
 
   return (
     <div className={styles.dashboard}>
+      <header className={styles.header}>
+        <h2 className={styles.greeting}>{greeting}</h2>
+        <p className={styles.date}>{new Date().toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+      </header>
+
+      {/* کارت وضعیت سریع */}
       <div className={styles.quickStatus}>
-        <h2>{greetingMessage}</h2>
-        <div className={styles.assetSummary}>
+        <h3>{t.quickStatus || (language === 'fa' ? 'خلاصه وضعیت' : 'Quick Status')}</h3>
+        <div className={styles.assetCards}>
           {filteredAssets.map(asset => (
-            <span key={asset.name} className={asset.change > 0 ? styles.green : styles.red}>
-              {asset.name}: {asset.change > 0 ? '+' : ''}{asset.change}%
-            </span>
+            <div key={asset.id} className={styles.assetCard}>
+              <span className={styles.assetName}>{asset.name}</span>
+              <span className={styles.assetPrice}>{asset.price.toLocaleString()}</span>
+              <span className={asset.change >= 0 ? styles.green : styles.red}>
+                {asset.change > 0 ? '+' : ''}{asset.change}%
+              </span>
+            </div>
           ))}
         </div>
       </div>
 
+      {/* رویداد کلیدی روز */}
       <div className={styles.keyEvent}>
         <h3>{t.keyEventTitle}</h3>
-        <p>{mockData.keyEvent}</p>
+        <p className={styles.eventTitle}>{mockData.keyEvent.title}</p>
+        <p className={styles.eventSummary}>{mockData.keyEvent.summary}</p>
       </div>
 
+      {/* نمای بازار ساده */}
       {filteredMarkets.length > 0 && (
         <div className={styles.marketOverview}>
           <h3>{t.marketOverview}</h3>
@@ -77,19 +83,26 @@ export default function Dashboard() {
         </div>
       )}
 
-      {filteredAlerts.length > 0 && (
+      {/* هشدارهای فوری */}
+      {relevantAlerts.length > 0 && (
         <div className={styles.alertsPreview}>
           <h3>{t.alertsSection}</h3>
-          {filteredAlerts.slice(0,2).map((alert, i) => (
-            <div key={i} className={styles.alertRow}>{alert.message}</div>
+          {relevantAlerts.map(alert => (
+            <div key={alert.id} className={styles.alertRow}>
+              <span className={styles.alertIcon}>⚠️</span>
+              <span>{alert.message}</span>
+            </div>
           ))}
         </div>
       )}
 
+      {/* خلاصه هوش مصنوعی */}
       <div className={styles.dailyBrief}>
         <h3>{t.dailyBrief}</h3>
-        <ul>
-          {briefPoints.map((point, i) => <li key={i}>{point}</li>)}
+        <ul className={styles.briefList}>
+          {relevantBrief.map((point, idx) => (
+            <li key={idx}>{point.text}</li>
+          ))}
         </ul>
       </div>
     </div>

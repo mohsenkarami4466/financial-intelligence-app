@@ -5,14 +5,36 @@
 
 .title {
   font-size: 22px;
-  margin-bottom: 4px;
-  font-weight: 600;
+  margin-bottom: 16px;
 }
 
-.subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
+.addBtn {
+  background: #007aff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.form {
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.form input,
+.form select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .assetList {
@@ -26,47 +48,19 @@
   justify-content: space-between;
   align-items: center;
   background: var(--bg-secondary);
-  border-radius: 12px;
   padding: 16px;
-  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
-.assetInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.type {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
-.assetIcon {
-  font-size: 32px;
-}
-
-.assetName {
+.price {
+  font-weight: 600;
   font-size: 16px;
-  font-weight: 600;
-  margin: 0;
 }
 
-.assetChange {
-  margin: 4px 0 0;
-  font-size: 14px;
-}
-
-.green {
-  color: var(--green);
-  font-weight: 600;
-}
-
-.red {
-  color: var(--red);
-  font-weight: 600;
-}
-
-.label {
-  color: var(--text-secondary);
-}
-
-.assetTrend {
-  font-size: 24px;
-  color: var(--text-secondary);
-}
+.green { color: var(--green); }
+.red { color: var(--red); }
