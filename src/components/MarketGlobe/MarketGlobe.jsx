@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Globe from 'globe.gl';
 import marketLocations from '../../data/marketLocations';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -6,7 +6,6 @@ import styles from './MarketGlobe.module.css';
 
 const CDN_EARTH_IMAGE = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
 
-// بافت fallback (مشابه قبل)
 function createFallbackTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 1024;
@@ -39,6 +38,9 @@ function isMarketOpen(market) {
   return currentTotal >= openTotal && currentTotal < closeTotal;
 }
 
+// نمای اولیه روی ایران
+const INITIAL_VIEW = { lat: 35.7219, lng: 51.3347, altitude: 2.5 };
+
 export default function MarketGlobe({ onClose }) {
   const globeEl = useRef(null);
   const globeInstance = useRef(null);
@@ -47,10 +49,14 @@ export default function MarketGlobe({ onClose }) {
   const [alertMinutes, setAlertMinutes] = useState(30);
   const [indexAlert, setIndexAlert] = useState('');
   const [indexThreshold, setIndexThreshold] = useState('');
-  const [textureSrc, setTextureSrc] = useState(null); // تصویر نهایی
+  const [textureSrc, setTextureSrc] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredMarkets, setFilteredMarkets] = useState([]);
 
-  // پیش‌بارگذاری تصویر CDN
+  // پیش‌بارگذاری تصویر
   useEffect(() => {
     const img = new Image();
     img.onload = () => setTextureSrc(CDN_EARTH_IMAGE);
@@ -58,10 +64,10 @@ export default function MarketGlobe({ onClose }) {
     img.src = CDN_EARTH_IMAGE;
   }, []);
 
+  // ایجاد کره
   useEffect(() => {
     if (!globeEl.current || !textureSrc) return;
 
-    // پاک‌سازی instance قبلی
     if (globeInstance.current) {
       globeInstance.current._destructor();
       globeInstance.current = null;
@@ -77,11 +83,15 @@ export default function MarketGlobe({ onClose }) {
       .pointLat('lat')
       .pointLng('lng')
       .pointColor((d) => (isMarketOpen(d) ? '#2ecc71' : '#e74c3c'))
-      .pointRadius(0.25)          // نقطه‌های بسیار کوچک
+      .pointRadius(0.25)
       .pointResolution(6)
-      .pointAltitude(0.01)        // چسبیده به سطح
+      .pointAltitude(0.01)
       .onPointClick((d) => setSelectedMarket(d))
-      .onGlobeReady(() => setIsLoaded(true));
+      .onGlobeReady(() => {
+        setIsLoaded(true);
+        // تنظیم نمای اولیه
+        globe.pointOfView(INITIAL_VIEW, 1000);
+      });
 
     globe.controls().autoRotate = true;
     globe.controls().autoRotateSpeed = 0.8;
@@ -96,7 +106,6 @@ export default function MarketGlobe({ onClose }) {
       }
     };
     window.addEventListener('resize', handleResize);
-
     return () => {
       window.removeEventListener('resize', handleResize);
       if (globeInstance.current) {
@@ -105,6 +114,46 @@ export default function MarketGlobe({ onClose }) {
       }
     };
   }, [textureSrc]);
+
+  // کنترل چرخش خودکار
+  useEffect(() => {
+    if (globeInstance.current) {
+      globeInstance.current.controls().autoRotate = autoRotate;
+    }
+  }, [autoRotate]);
+
+  // جستجوی بازار
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    if (term.trim() === '') {
+      setFilteredMarkets([]);
+      return;
+    }
+    const filtered = marketLocations.filter(m =>
+      m.name.toLowerCase().includes(term.toLowerCase()) ||
+      m.shortName.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredMarkets(filtered);
+  };
+
+  const flyToMarket = (market) => {
+    if (globeInstance.current) {
+      globeInstance.current.pointOfView({ lat: market.lat, lng: market.lng, altitude: 1.2 }, 1000);
+      setSelectedMarket(market);
+      setSearchTerm('');
+      setFilteredMarkets([]);
+      setShowSettings(false);
+    }
+  };
+
+  const resetView = () => {
+    if (globeInstance.current) {
+      globeInstance.current.pointOfView(INITIAL_VIEW, 1000);
+    }
+    setShowSettings(false);
+  };
+
+  const toggleAutoRotate = () => setAutoRotate(prev => !prev);
 
   const handleSaveAlert = () => {
     if (!selectedMarket) return;
@@ -128,18 +177,52 @@ export default function MarketGlobe({ onClose }) {
     save: language === 'fa' ? 'ذخیره' : 'Save',
     close: language === 'fa' ? 'بستن' : 'Close',
     exit: language === 'fa' ? 'خروج' : 'Exit',
+    settings: language === 'fa' ? 'تنظیمات' : 'Settings',
+    searchPlaceholder: language === 'fa' ? 'جستجوی بازار...' : 'Search market...',
+    autoRotateLabel: language === 'fa' ? 'چرخش خودکار' : 'Auto-rotate',
+    resetView: language === 'fa' ? 'بازنشانی نما' : 'Reset view',
   };
 
   return (
     <div className={styles.fullscreen}>
+      {/* دکمه تنظیمات */}
       <div className={styles.controls}>
-        <button className={styles.controlBtn} onClick={onClose}>
-          ✕ {t.exit}
+        <button className={styles.controlBtn} onClick={() => setShowSettings(!showSettings)}>
+          ⚙️ {t.settings}
         </button>
-        {selectedMarket && (
-          <button className={styles.controlBtn} onClick={() => setSelectedMarket(null)}>
-            ← {t.close}
-          </button>
+        {showSettings && (
+          <div className={styles.settingsPanel}>
+            <div className={styles.settingsRow}>
+              <label>
+                <input type="checkbox" checked={autoRotate} onChange={toggleAutoRotate} />
+                {t.autoRotateLabel}
+              </label>
+            </div>
+            <div className={styles.settingsRow}>
+              <input
+                type="text"
+                placeholder={t.searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                className={styles.searchInput}
+              />
+              {filteredMarkets.length > 0 && (
+                <ul className={styles.searchResults}>
+                  {filteredMarkets.map(m => (
+                    <li key={m.id} onClick={() => flyToMarket(m)}>
+                      {m.shortName} - {m.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button className={styles.settingsBtn} onClick={resetView}>
+              {t.resetView}
+            </button>
+            <button className={styles.settingsBtn} onClick={onClose}>
+              ✕ {t.exit}
+            </button>
+          </div>
         )}
       </div>
 

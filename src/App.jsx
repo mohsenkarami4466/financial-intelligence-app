@@ -24,6 +24,7 @@ const SCREENS = {
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState(SCREENS.ONBOARDING);
   const [isOnboarded, setIsOnboarded] = useState(false);
+  const [showOnboardingOverride, setShowOnboardingOverride] = useState(false);
   const { theme } = useTheme();
   const { language } = useLanguage();
   const { preferences, updatePreferences } = useUserPreferences();
@@ -48,17 +49,52 @@ function AppContent() {
     });
     localStorage.setItem('fi_onboarded', 'true');
     setIsOnboarded(true);
+    setShowOnboardingOverride(false);
     setCurrentScreen(SCREENS.DASHBOARD);
   };
 
+  const handleEditSetup = () => {
+    // شروع دوبارهٔ راهنما با مقادیر فعلی
+    setShowOnboardingOverride(true);
+    setCurrentScreen(SCREENS.ONBOARDING);
+  };
+
+  const handleResetAll = () => {
+    // بازنشانی کامل و رفتن به راهنمای خالی
+    localStorage.removeItem('fi_onboarded');
+    updatePreferences({ interests: [], notificationLevel: 'important' });
+    setIsOnboarded(false);
+    setShowOnboardingOverride(false);
+    setCurrentScreen(SCREENS.ONBOARDING);
+  };
+
   const getScreen = () => {
-    if (!isOnboarded) return <Onboarding onComplete={handleOnboardingComplete} />;
+    // اگر بازنویسی راهنما فعال باشد یا هنوز آنبورد نشده باشد
+    if (!isOnboarded || showOnboardingOverride) {
+      const initialInterests = showOnboardingOverride ? preferences.interests : [];
+      const initialNotification = showOnboardingOverride ? preferences.notificationLevel : 'important';
+      return (
+        <Onboarding
+          onComplete={handleOnboardingComplete}
+          initialInterests={initialInterests}
+          initialNotification={initialNotification}
+          isEdit={showOnboardingOverride}
+        />
+      );
+    }
+
     switch (currentScreen) {
       case SCREENS.DASHBOARD: return <Dashboard />;
       case SCREENS.ALERTS: return <Alerts />;
       case SCREENS.ASSETS: return <Assets />;
       case SCREENS.MARKETS: return <MarketGlobe onClose={() => setCurrentScreen(SCREENS.DASHBOARD)} />;
-      case SCREENS.SETTINGS: return <Settings />;
+      case SCREENS.SETTINGS:
+        return (
+          <Settings
+            onEditSetup={handleEditSetup}
+            onResetAll={handleResetAll}
+          />
+        );
       default: return <Dashboard />;
     }
   };
@@ -68,7 +104,7 @@ function AppContent() {
       <div className="screen-content">
         {getScreen()}
       </div>
-      {isOnboarded && currentScreen !== SCREENS.MARKETS && (
+      {isOnboarded && !showOnboardingOverride && currentScreen !== SCREENS.MARKETS && (
         <>
           <BottomNav current={currentScreen} onNavigate={setCurrentScreen} />
           <FloatingThemeButton />

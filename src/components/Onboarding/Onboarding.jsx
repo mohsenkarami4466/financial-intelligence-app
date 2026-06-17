@@ -3,12 +3,12 @@ import styles from './Onboarding.module.css';
 import { useLanguage } from '../../contexts/LanguageContext';
 import translations from '../../i18n/translations';
 
-export default function Onboarding({ onComplete }) {
+export default function Onboarding({ onComplete, initialInterests = [], initialNotification = 'important', isEdit = false }) {
   const { language } = useLanguage();
   const t = translations[language].onboarding;
   const [step, setStep] = useState(0);
-  const [interests, setInterests] = useState([]);
-  const [notification, setNotification] = useState('important');
+  const [interests, setInterests] = useState(initialInterests);
+  const [notification, setNotification] = useState(initialNotification);
 
   const totalSteps = 4;
 
@@ -16,7 +16,6 @@ export default function Onboarding({ onComplete }) {
     if (step < totalSteps - 1) {
       setStep(step + 1);
     } else {
-      // ارسال انتخاب‌ها به والد
       onComplete({ interests, notification });
     }
   };
@@ -47,14 +46,14 @@ export default function Onboarding({ onComplete }) {
       <div className={styles.content}>
         {step === 0 && (
           <div className={styles.step}>
-            <h1 className={styles.welcomeTitle}>{t.welcome}</h1>
-            <p className={styles.description}>{t.welcomeDesc}</p>
+            <h1 className={styles.welcomeTitle}>{isEdit ? t.editWelcome : t.welcome}</h1>
+            <p className={styles.description}>{isEdit ? t.editWelcomeDesc : t.welcomeDesc}</p>
           </div>
         )}
 
         {step === 1 && (
           <div className={styles.step}>
-            <h2 className={styles.stepTitle}>{t.interests}</h2>
+            <h2 className={styles.stepTitle}>{t.interestsTitle}</h2>
             <p className={styles.stepDesc}>{t.interestsDesc}</p>
             <div className={styles.interestsGrid}>
               {interestsList.map((item) => (
@@ -72,7 +71,7 @@ export default function Onboarding({ onComplete }) {
 
         {step === 2 && (
           <div className={styles.step}>
-            <h2 className={styles.stepTitle}>{t.notification}</h2>
+            <h2 className={styles.stepTitle}>{t.notificationTitle}</h2>
             <p className={styles.stepDesc}>{t.notificationDesc}</p>
             <div className={styles.notifOptions}>
               {['important', 'daily', 'realtime'].map((type) => (
@@ -93,24 +92,30 @@ export default function Onboarding({ onComplete }) {
 
         {step === 3 && (
           <div className={styles.step}>
-            <h2 className={styles.stepTitle}>{t.signup}</h2>
-            <p className={styles.stepDesc}>{t.signupDesc}</p>
+            <h2 className={styles.stepTitle}>{t.summary}</h2>
+            <p className={styles.stepDesc}>{t.summaryDesc}</p>
+            <div className={styles.summaryBox}>
+              <p><strong>{t.selectedInterests}:</strong> {interests.length ? interests.join(', ') : t.none}</p>
+              <p><strong>{t.selectedNotification}:</strong> {t[notification]}</p>
+            </div>
             <button className={styles.skipBtn} onClick={nextStep}>
-              {t.later}
+              {isEdit ? t.saveAndExit : t.finish}
             </button>
           </div>
         )}
       </div>
 
       <div className={styles.actions}>
-        {step > 0 && (
+        {step > 0 && step < 3 && (
           <button className={styles.secondaryBtn} onClick={prevStep}>
             {t.back}
           </button>
         )}
-        <button className={styles.primaryBtn} onClick={nextStep}>
-          {step === totalSteps - 1 ? t.finish : t.next}
-        </button>
+        {step < 3 && (
+          <button className={styles.primaryBtn} onClick={nextStep}>
+            {step === totalSteps - 2 ? t.review : t.next}
+          </button>
+        )}
       </div>
     </div>
   );

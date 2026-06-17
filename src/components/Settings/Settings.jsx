@@ -4,7 +4,7 @@ import { useUserPreferences } from '../../contexts/UserPreferencesContext';
 import translations from '../../i18n/translations';
 import styles from './Settings.module.css';
 
-export default function Settings() {
+export default function Settings({ onEditSetup, onResetAll }) {
   const { language, toggleLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const { preferences, updatePreferences } = useUserPreferences();
@@ -24,17 +24,12 @@ export default function Settings() {
     updatePreferences({ notificationLevel: level });
   };
 
-  const resetOnboarding = () => {
-    localStorage.removeItem('fi_onboarded');
-    window.location.reload();
-  };
-
   return (
     <div className={styles.settings}>
       <h2 className={styles.title}>{t.title}</h2>
 
       <div className={styles.section}>
-        <h3>{t.interests || (language === 'fa' ? 'علایق' : 'Interests')}</h3>
+        <h3>{t.interests}</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
           {interestsList.map(item => (
             <button
@@ -80,6 +75,17 @@ export default function Settings() {
       </div>
 
       <div className={styles.section}>
+        <h3>{t.setupManagement}</h3>
+        <p className={styles.note}>{t.setupManagementDesc}</p>
+        <button className={styles.btn} onClick={onEditSetup}>
+          {t.editSetup}
+        </button>
+        <button className={styles.btnDanger} onClick={onResetAll}>
+          {t.resetAll}
+        </button>
+      </div>
+
+      <div className={styles.section}>
         <h3>{t.language}</h3>
         <button className={styles.btn} onClick={toggleLanguage}>
           {language === 'fa' ? 'English' : 'فارسی'}
@@ -90,14 +96,6 @@ export default function Settings() {
         <h3>{t.appearance}</h3>
         <button className={styles.btn} onClick={toggleTheme}>
           {theme === 'light' ? t.darkMode : t.lightMode}
-        </button>
-      </div>
-
-      <div className={styles.section}>
-        <h3>{t.resetOnboarding}</h3>
-        <p className={styles.note}>{t.resetOnboardingDesc}</p>
-        <button className={styles.btn} onClick={resetOnboarding}>
-          {t.reset}
         </button>
       </div>
 
