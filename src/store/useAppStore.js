@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import mockData from '../data/mockData';
+import marketLocations from '../data/marketLocations';
+import { computeMarketOpenStatus } from '../utils/marketHours';
 
 const defaultPreferences = {
   interests: ['USD', 'Gold', 'Crypto', 'Stocks', 'Economic News'],
@@ -56,6 +58,19 @@ export const useAppStore = create(
         })),
 
       setMarketData: (marketData) => set({ marketData }),
+
+      /** وضعیت باز/بسته بازارها – کش در حافظه (بدون persist) */
+      marketOpenStatus: computeMarketOpenStatus(marketLocations),
+      lastMarketStatusUpdate: Date.now(),
+      globeViewMode: '3d',
+
+      refreshMarketOpenStatus: () =>
+        set({
+          marketOpenStatus: computeMarketOpenStatus(marketLocations),
+          lastMarketStatusUpdate: Date.now(),
+        }),
+
+      setGlobeViewMode: (mode) => set({ globeViewMode: mode }),
     }),
     {
       name: 'fi_app_store',
@@ -72,3 +87,5 @@ export const usePreferences = () => useAppStore((s) => s.preferences);
 export const useUpdatePreferences = () => useAppStore((s) => s.updatePreferences);
 export const useAlerts = () => useAppStore((s) => s.alerts);
 export const useMarketData = () => useAppStore((s) => s.marketData);
+export const useMarketOpenStatus = () => useAppStore((s) => s.marketOpenStatus);
+export const useGlobeViewMode = () => useAppStore((s) => s.globeViewMode);
