@@ -1,54 +1,62 @@
 import mockData from '../data/mockData';
+import api, { IS_MOCK_API } from '../api/axiosInstance';
 import { simulateNetworkDelay, serviceCall } from './helpers';
 
-/**
- * خلاصهٔ دارایی‌ها و شاخص‌های بازار
- * @returns {Promise<{ data: { assets: Array, market: Array } | null, error: string | null }>}
- */
+async function mockGetMarketData() {
+  await simulateNetworkDelay();
+  return {
+    assets: mockData.assets,
+    market: mockData.market,
+    keyEvent: mockData.keyEvent,
+    brief: mockData.brief,
+  };
+}
+
 export async function getSummary() {
+  if (IS_MOCK_API) {
+    return serviceCall(async () => {
+      const data = await mockGetMarketData();
+      return { assets: data.assets, market: data.market };
+    });
+  }
   return serviceCall(async () => {
-    await simulateNetworkDelay();
-    return {
-      assets: mockData.assets,
-      market: mockData.market,
-    };
+    const { data: res } = await api.get('/market/summary');
+    return res.data;
   });
 }
 
-/**
- * رویداد کلیدی روز
- * @returns {Promise<{ data: object | null, error: string | null }>}
- */
 export async function getEvents() {
+  if (IS_MOCK_API) {
+    return serviceCall(async () => {
+      await simulateNetworkDelay();
+      return mockData.keyEvent;
+    });
+  }
   return serviceCall(async () => {
-    await simulateNetworkDelay();
-    return mockData.keyEvent;
+    const { data: res } = await api.get('/market/events');
+    return res.data;
   });
 }
 
-/**
- * خلاصهٔ هوش مصنوعی روزانه
- * @returns {Promise<{ data: Array | null, error: string | null }>}
- */
 export async function getBrief() {
+  if (IS_MOCK_API) {
+    return serviceCall(async () => {
+      await simulateNetworkDelay();
+      return mockData.brief;
+    });
+  }
   return serviceCall(async () => {
-    await simulateNetworkDelay();
-    return mockData.brief;
+    const { data: res } = await api.get('/market/brief');
+    return res.data;
   });
 }
 
-/**
- * دریافت همهٔ داده‌های بازار یکجا
- * @returns {Promise<{ data: object | null, error: string | null }>}
- */
 export async function getMarketData() {
+  if (IS_MOCK_API) {
+    return serviceCall(mockGetMarketData);
+  }
   return serviceCall(async () => {
-    await simulateNetworkDelay();
-    return {
-      assets: mockData.assets,
-      market: mockData.market,
-      keyEvent: mockData.keyEvent,
-      brief: mockData.brief,
-    };
+    const { data: res } = await api.get('/market/all');
+    return res.data;
   });
 }
