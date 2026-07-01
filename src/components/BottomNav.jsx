@@ -1,36 +1,55 @@
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import styles from './BottomNav.module.css';
 
-const tabs = ['dashboard', 'alerts', 'assets', 'markets', 'settings'];
+const tabs = [
+  { id: 'dashboard', path: '/dashboard' },
+  { id: 'alerts', path: '/alerts' },
+  { id: 'assets', path: '/assets' },
+  { id: 'markets', path: '/markets' },
+  { id: 'settings', path: '/settings' },
+];
+
 const icons = {
   dashboard: '🏠',
   alerts: '🔔',
   assets: '💰',
   markets: '🌍',
-  settings: '⚙️'
+  settings: '⚙️',
 };
 
-export default function BottomNav({ current, onNavigate }) {
+export default function BottomNav() {
   const { language } = useLanguage();
+  const navigate = useNavigate();
+
   const labels = {
     dashboard: language === 'fa' ? 'خانه' : 'Home',
     alerts: language === 'fa' ? 'هشدارها' : 'Alerts',
     assets: language === 'fa' ? 'دارایی‌ها' : 'Assets',
     markets: language === 'fa' ? 'بازارها' : 'Markets',
-    settings: language === 'fa' ? 'تنظیمات' : 'Settings'
+    settings: language === 'fa' ? 'تنظیمات' : 'Settings',
   };
 
   return (
     <nav className={styles.bottomNav}>
-      {tabs.map(tab => (
-        <button
-          key={tab}
-          className={`${styles.navItem} ${current === tab ? styles.active : ''}`}
-          onClick={() => onNavigate(tab)}
+      {tabs.map(({ id, path }) => (
+        <NavLink
+          key={id}
+          to={path}
+          className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.active : ''}`
+          }
+          // markets خارج از MainLayout است؛ NavLink فقط هنگام باز بودن active می‌شود
+          onClick={(e) => {
+            if (id === 'markets') {
+              e.preventDefault();
+              navigate('/markets');
+            }
+          }}
         >
-          <span className={styles.icon}>{icons[tab]}</span>
-          <span className={styles.label}>{labels[tab]}</span>
-        </button>
+          <span className={styles.icon}>{icons[id]}</span>
+          <span className={styles.label}>{labels[id]}</span>
+        </NavLink>
       ))}
     </nav>
   );
