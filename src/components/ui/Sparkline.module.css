@@ -1,0 +1,6 @@
+.sparkline {
+  display: block;
+  width: 80px;
+  height: 28px;
+  flex-shrink: 0;
+}
