@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { usePreferences, useMarketData } from '../../store/useAppStore';
+import { usePreferences } from '../../store/useAppStore';
+import { getSummary } from '../../services/marketService';
+import { unwrapService } from '../../providers/QueryProvider';
 import translations from '../../i18n/translations';
+import LoadingSkeleton, { ErrorMessage } from '../ui/QueryState';
 import styles from './Assets.module.css';
 
 export default function Assets() {
   const { language } = useLanguage();
   const preferences = usePreferences();
-  const marketData = useMarketData();
   const t = translations[language].assets;
   const [customAssets, setCustomAssets] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -15,7 +18,15 @@ export default function Assets() {
   const [price, setPrice] = useState('');
   const [type, setType] = useState('other');
 
-  const baseAssets = marketData.assets.filter((asset) => {
+  const { data: summary, isLoading, error, refetch } = useQuery({
+    queryKey: ['marketSummary'],
+    queryFn: () => unwrapService(getSummary()),
+  });
+
+  if (isLoading) return <LoadingSkeleton variant="cards" />;
+  if (error) return <ErrorMessage message={error.message} onRetry={refetch} />;
+
+  const baseAssets = (summary?.assets ?? []).filter((asset) => {
     if (preferences.interests.length === 0) return true;
     return preferences.interests.some((interest) => asset.name.includes(interest));
   });

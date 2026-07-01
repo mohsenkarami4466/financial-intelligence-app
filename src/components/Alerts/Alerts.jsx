@@ -1,21 +1,49 @@
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
 import translations from '../../i18n/translations';
-import { useAlerts, useMarketData, useAppStore } from '../../store/useAppStore';
+import { getAlerts, addAlert, toggleAlert } from '../../services/alertService';
+import { getSummary } from '../../services/marketService';
+import { unwrapService } from '../../providers/QueryProvider';
+import LoadingSkeleton, { ErrorMessage } from '../ui/QueryState';
 import styles from './Alerts.module.css';
 
 export default function Alerts() {
   const { language } = useLanguage();
   const t = translations[language].alerts;
-  const alerts = useAlerts();
-  const marketData = useMarketData();
-  const toggleAlert = useAppStore((s) => s.toggleAlert);
-  const addAlertToStore = useAppStore((s) => s.addAlert);
+  const queryClient = useQueryClient();
   const [newAlert, setNewAlert] = useState({ assetId: '', condition: 'above', value: '' });
 
-  const addAlert = () => {
-    if (!newAlert.assetId || !newAlert.value) return;
-    const asset = marketData.assets.find((a) => a.id === newAlert.assetId);
+  const {
+    data: alerts,
+    isLoading: alertsLoading,
+    error: alertsError,
+    refetch: refetchAlerts,
+  } = useQuery({
+    queryKey: ['alerts'],
+    queryFn: () => unwrapService(getAlerts()),
+  });
+
+  const { data: summary } = useQuery({
+    queryKey: ['marketSummary'],
+    queryFn: () => unwrapService(getSummary()),
+  });
+
+  const addMutation = useMutation({
+    mutationFn: (alert) => unwrapService(addAlert(alert)),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['alerts'] }),
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: (id) => unwrapService(toggleAlert(id)),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['alerts'] }),
+  });
+
+  const handleAddAlert = () => {
+    if (!newAlert.assetId || !newAlert.value || !summary) return;
+    const asset = summary.assets.find((a) => a.id === newAlert.assetId);
+    if (!asset) return;
+
     const alertObj = {
       id: Date.now(),
       type: 'price',
@@ -25,9 +53,14 @@ export default function Alerts() {
       active: true,
       message: `${asset.name} ${newAlert.condition === 'above' ? '>' : '<'} ${newAlert.value}`,
     };
-    addAlertToStore(alertObj);
+    addMutation.mutate(alertObj);
     setNewAlert({ assetId: '', condition: 'above', value: '' });
   };
+
+  if (alertsLoading) return <LoadingSkeleton variant="list" />;
+  if (alertsError) return <ErrorMessage message={alertsError.message} onRetry={refetchAlerts} />;
+
+  const assets = summary?.assets ?? [];
 
   return (
     <div className={styles.alerts}>
@@ -41,7 +74,7 @@ export default function Alerts() {
             onChange={(e) => setNewAlert({ ...newAlert, assetId: e.target.value })}
           >
             <option value="">{language === 'fa' ? 'انتخاب دارایی' : 'Select asset'}</option>
-            {marketData.assets.map((a) => (
+            {assets.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
               </option>
@@ -60,12 +93,14 @@ export default function Alerts() {
             value={newAlert.value}
             onChange={(e) => setNewAlert({ ...newAlert, value: e.target.value })}
           />
-          <button onClick={addAlert}>{language === 'fa' ? 'افزودن' : 'Add'}</button>
+          <button onClick={handleAddAlert} disabled={addMutation.isPending}>
+            {language === 'fa' ? 'افزودن' : 'Add'}
+          </button>
         </div>
       </div>
 
       <div className={styles.alertList}>
-        {alerts.map((alert) => (
+        {(alerts ?? []).map((alert) => (
           <div
             key={alert.id}
             className={`${styles.alertCard} ${alert.active ? styles.active : styles.inactive}`}
@@ -78,7 +113,8 @@ export default function Alerts() {
               <input
                 type="checkbox"
                 checked={alert.active}
-                onChange={() => toggleAlert(alert.id)}
+                disabled={toggleMutation.isPending}
+                onChange={() => toggleMutation.mutate(alert.id)}
               />
               <span className={styles.slider}></span>
             </label>

@@ -1,15 +1,33 @@
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { usePreferences, useMarketData, useAlerts } from '../../store/useAppStore';
+import { usePreferences, useAlerts } from '../../store/useAppStore';
+import { getMarketData } from '../../services/marketService';
+import { unwrapService } from '../../providers/QueryProvider';
 import translations from '../../i18n/translations';
+import LoadingSkeleton, { ErrorMessage } from '../ui/QueryState';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
   const { language } = useLanguage();
   const preferences = usePreferences();
-  const marketData = useMarketData();
   const alerts = useAlerts();
   const t = translations[language].dashboard;
   const { interests } = preferences;
+
+  const {
+    data: marketData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['marketData'],
+    queryFn: () => unwrapService(getMarketData()),
+  });
+
+  if (isLoading) return <LoadingSkeleton variant="page" />;
+  if (error) return <ErrorMessage message={error.message} onRetry={refetch} />;
+  if (!marketData) return null;
+
   const { assets, market, keyEvent, brief } = marketData;
 
   const userAssetNames = interests.map((i) => (i === 'Economic News' ? null : i)).filter(Boolean);

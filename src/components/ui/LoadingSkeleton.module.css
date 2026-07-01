@@ -1,0 +1,61 @@
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.pageSkeleton,
+.skeletonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.titleSkeleton {
+  height: 28px;
+  width: 60%;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.cardSkeleton {
+  height: 72px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.lineSkeleton {
+  height: 20px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.errorBox {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  text-align: center;
+}
+
+.errorBox p {
+  margin: 0 0 12px;
+  color: #e74c3c;
+}
+
+.retryBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #007aff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.retryBtn:hover {
+  opacity: 0.9;
+}

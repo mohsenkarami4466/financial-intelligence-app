@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import QueryProvider from './providers/QueryProvider';
 import './App.css';
 
 /** basename مطابق vite.config.js برای GitHub Pages */
@@ -30,9 +31,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <BrowserRouter basename={BASENAME}>
-          <AppShell />
-        </BrowserRouter>
+        <QueryProvider>
+          <BrowserRouter basename={BASENAME}>
+            <AppShell />
+          </BrowserRouter>
+        </QueryProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
