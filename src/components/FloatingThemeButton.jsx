@@ -1,4 +1,4 @@
-import { useTheme } from '../contexts/ThemeContext';   // تصحیح شد: ../ به جای ../../
+import { useTheme } from '../providers/ThemeContext';
 import styles from './FloatingThemeButton.module.css';
 
 export default function FloatingThemeButton() {

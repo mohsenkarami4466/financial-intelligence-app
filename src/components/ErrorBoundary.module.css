@@ -1,0 +1,28 @@
+.boundary {
+  padding: 24px;
+  text-align: center;
+  margin: 16px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+}
+
+.boundary h2 {
+  margin: 0 0 8px;
+  color: #e74c3c;
+}
+
+.boundary p {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.boundary button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #007aff;
+  color: #fff;
+  cursor: pointer;
+}

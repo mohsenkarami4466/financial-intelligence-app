@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { ThemeProvider, useTheme } from './providers/ThemeContext';
+import { LanguageProvider, useLanguage } from './providers/LanguageContext';
 import QueryProvider from './providers/QueryProvider';
 import './App.css';
 

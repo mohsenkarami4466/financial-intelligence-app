@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Onboarding from '../components/Onboarding/Onboarding';
+import Onboarding from '../features/Onboarding/Onboarding';
 import { useUpdatePreferences } from '../store/useAppStore';
 import { setOnboarded } from '../utils/onboarding';
 

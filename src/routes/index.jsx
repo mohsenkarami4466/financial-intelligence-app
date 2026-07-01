@@ -1,27 +1,35 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import OnboardingRoute from './OnboardingRoute';
-import MainLayout from './MainLayout';
+import MainLayout from '../layouts/MainLayout';
 import SettingsPage from './SettingsPage';
 import MarketsPage from './MarketsPage';
-import Dashboard from '../components/Dashboard/Dashboard';
-import Alerts from '../components/Alerts/Alerts';
-import Assets from '../components/Assets/Assets';
+import ErrorBoundary from '../components/ErrorBoundary';
+import Dashboard from '../features/Dashboard/Dashboard';
+import Alerts from '../features/Alerts/Alerts';
+import Assets from '../features/Assets/Assets';
 import { isOnboarded } from '../utils/onboarding';
 
 function RootRedirect() {
   return <Navigate to={isOnboarded() ? '/dashboard' : '/onboarding'} replace />;
 }
 
+function Page({ children }) {
+  return <ErrorBoundary>{children}</ErrorBoundary>;
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<RootRedirect />} />
-
-      {/* راهنمای اولیه – بدون ناوبری پایین */}
-      <Route path="/onboarding" element={<OnboardingRoute />} />
-
-      {/* مسیرهای محافظت‌شده با ناوبری پایین */}
+      <Route
+        path="/onboarding"
+        element={
+          <Page>
+            <OnboardingRoute />
+          </Page>
+        }
+      />
       <Route
         element={
           <ProtectedRoute>
@@ -29,23 +37,49 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/assets" element={<Assets />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <Page>
+              <Dashboard />
+            </Page>
+          }
+        />
+        <Route
+          path="/alerts"
+          element={
+            <Page>
+              <Alerts />
+            </Page>
+          }
+        />
+        <Route
+          path="/assets"
+          element={
+            <Page>
+              <Assets />
+            </Page>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <Page>
+              <SettingsPage />
+            </Page>
+          }
+        />
       </Route>
-
-      {/* بازارها – تمام‌صفحه، بدون BottomNav */}
       <Route
         path="/markets"
         element={
           <ProtectedRoute>
-            <MarketsPage />
+            <Page>
+              <MarketsPage />
+            </Page>
           </ProtectedRoute>
         }
       />
-
-      {/* مسیر نامعتبر */}
       <Route path="*" element={<RootRedirect />} />
     </Routes>
   );

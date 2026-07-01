@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../providers/LanguageContext';
 import styles from './BottomNav.module.css';
 
 const tabs = [

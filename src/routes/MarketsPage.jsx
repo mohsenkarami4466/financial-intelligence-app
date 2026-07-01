@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import MarketGlobe from '../components/MarketGlobe/MarketGlobe';
+import MarketGlobe from '../features/MarketGlobe/MarketGlobe';
 
 export default function MarketsPage() {
   const navigate = useNavigate();

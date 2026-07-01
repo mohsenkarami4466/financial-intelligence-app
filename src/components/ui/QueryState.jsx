@@ -1,4 +1,4 @@
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../providers/LanguageContext';
 import styles from './LoadingSkeleton.module.css';
 
 export function CardSkeleton({ count = 3 }) {
