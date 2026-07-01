@@ -1,13 +1,14 @@
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useUserPreferences } from '../../contexts/UserPreferencesContext';
+import { usePreferences, useUpdatePreferences } from '../../store/useAppStore';
 import translations from '../../i18n/translations';
 import styles from './Settings.module.css';
 
 export default function Settings({ onEditSetup, onResetAll }) {
   const { language, toggleLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
-  const { preferences, updatePreferences } = useUserPreferences();
+  const preferences = usePreferences();
+  const updatePreferences = useUpdatePreferences();
   const t = translations[language].settings;
 
   const interestsList = ['USD', 'Gold', 'Crypto', 'Stocks', 'Economic News'];
@@ -15,7 +16,7 @@ export default function Settings({ onEditSetup, onResetAll }) {
   const toggleInterest = (item) => {
     const current = preferences.interests;
     const newInterests = current.includes(item)
-      ? current.filter(i => i !== item)
+      ? current.filter((i) => i !== item)
       : [...current, item];
     updatePreferences({ interests: newInterests });
   };
@@ -31,7 +32,7 @@ export default function Settings({ onEditSetup, onResetAll }) {
       <div className={styles.section}>
         <h3>{t.interests}</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
-          {interestsList.map(item => (
+          {interestsList.map((item) => (
             <button
               key={item}
               className={`${styles.interestBtn} ${preferences.interests.includes(item) ? styles.selectedInterest : ''}`}

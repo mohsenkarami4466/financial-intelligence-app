@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useUserPreferences } from '../../contexts/UserPreferencesContext';
+import { usePreferences, useMarketData } from '../../store/useAppStore';
 import translations from '../../i18n/translations';
-import mockData from '../../data/mockData';
 import styles from './Assets.module.css';
 
 export default function Assets() {
   const { language } = useLanguage();
-  const { preferences } = useUserPreferences();
+  const preferences = usePreferences();
+  const marketData = useMarketData();
   const t = translations[language].assets;
   const [customAssets, setCustomAssets] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -15,9 +15,9 @@ export default function Assets() {
   const [price, setPrice] = useState('');
   const [type, setType] = useState('other');
 
-  const baseAssets = mockData.assets.filter(asset => {
+  const baseAssets = marketData.assets.filter((asset) => {
     if (preferences.interests.length === 0) return true;
-    return preferences.interests.some(interest => asset.name.includes(interest));
+    return preferences.interests.some((interest) => asset.name.includes(interest));
   });
 
   const allAssets = [...baseAssets, ...customAssets];
@@ -47,9 +47,18 @@ export default function Assets() {
 
       {showForm && (
         <div className={styles.form}>
-          <input placeholder={language === 'fa' ? 'نام دارایی' : 'Asset name'} value={name} onChange={e => setName(e.target.value)} />
-          <input type="number" placeholder={language === 'fa' ? 'قیمت' : 'Price'} value={price} onChange={e => setPrice(e.target.value)} />
-          <select value={type} onChange={e => setType(e.target.value)}>
+          <input
+            placeholder={language === 'fa' ? 'نام دارایی' : 'Asset name'}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder={language === 'fa' ? 'قیمت' : 'Price'}
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+          <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="stock">{language === 'fa' ? 'سهام' : 'Stock'}</option>
             <option value="crypto">{language === 'fa' ? 'ارز دیجیتال' : 'Crypto'}</option>
             <option value="commodity">{language === 'fa' ? 'کالا' : 'Commodity'}</option>
@@ -61,7 +70,7 @@ export default function Assets() {
       )}
 
       <div className={styles.assetList}>
-        {allAssets.map(asset => (
+        {allAssets.map((asset) => (
           <div key={asset.id} className={styles.assetCard}>
             <div>
               <h3>{asset.name}</h3>
@@ -69,7 +78,8 @@ export default function Assets() {
             </div>
             <div className={styles.price}>{asset.price.toLocaleString()}</div>
             <div className={asset.change >= 0 ? styles.green : styles.red}>
-              {asset.change > 0 ? '+' : ''}{asset.change}%
+              {asset.change > 0 ? '+' : ''}
+              {asset.change}%
             </div>
           </div>
         ))}

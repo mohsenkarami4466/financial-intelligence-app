@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import Settings from '../components/Settings/Settings';
-import { useUserPreferences } from '../contexts/UserPreferencesContext';
+import { useUpdatePreferences } from '../store/useAppStore';
 import { setOnboarded } from '../utils/onboarding';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { updatePreferences } = useUserPreferences();
+  const updatePreferences = useUpdatePreferences();
 
   const handleEditSetup = () => {
     navigate('/onboarding?edit=true');

@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import Onboarding from '../components/Onboarding/Onboarding';
-import { useUserPreferences } from '../contexts/UserPreferencesContext';
+import { useUpdatePreferences } from '../store/useAppStore';
 import { setOnboarded } from '../utils/onboarding';
 
 export default function OnboardingPage({ initialInterests, initialNotification, isEdit }) {
   const navigate = useNavigate();
-  const { updatePreferences } = useUserPreferences();
+  const updatePreferences = useUpdatePreferences();
 
   const handleComplete = (selections) => {
     updatePreferences({
